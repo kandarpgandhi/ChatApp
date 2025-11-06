@@ -1,70 +1,46 @@
-const express = require('express')
-const fs = require('fs')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken');
+require('dotenv').config();
+const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const path = require('path');
+const { sequelize } = require('./models');
+const authRoutes = require('./routes/auth');
 
-const app = express()
-const PORT = 3000
-const SECRET = 'MYSCECRETKEY'
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-app.use(bodyParser.json())
-app.use(cors())
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-const DATABASE_FILE = './database.json'
+// Set view engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-function readUsers() {
-    if (!fs.existsSync(DATABASE_FILE)) return [];
-    const data = fs.readFileSync(DATABASE_FILE);
-    return JSON.parse(data);
-}
+// Serve static files (like CSS, images, etc.)
+app.use(express.static(path.join(__dirname, 'public')));
 
-function writeUsers(users) {
-    fs.writeFileSync(DATABASE_FILE, JSON.stringify(users, null, 2));
-}
+// Routes
+app.use('/api/auth', authRoutes);
 
-app.post('/signup', async (req, res) => {
-    const { name, email, phone, password } = req.body;
+// 🟩 View Routes
+app.get('/', (req, res) => res.redirect('/signup'));
+app.get('/login', (req, res) => res.render('login'));
+app.get('/signup', (req, res) => res.render('signup'));
 
-    if (!name || !email || !phone || !password) {
-        return res.status(400).json({ message: "All fields are required" });
-    }
-
-    const users = readUsers();
-    const existing = users.find(u => u.email === email || u.phone === phone);
-    if (existing) {
-        return res.status(400).json({ message: "User already exists" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = { name, email, phone, password: hashedPassword };
-    users.push(newUser);
-    writeUsers(users);
-
-    res.status(201).json({ message: "User registered successfully" });
+// Chat page view
+app.get('/chat', (req, res) => {
+    res.render('chat');
 });
 
-app.post('/login', async (req, res) => {
-    const { emailOrPhone, password } = req.body;
-
-    const users = readUsers();
-    const user = users.find(u => u.email === emailOrPhone || u.phone === emailOrPhone);
-
-    if (!user) {
-        return res.status(400).json({ message: "User not found" });
+// Start server
+(async () => {
+    try {
+        await sequelize.authenticate();
+        await sequelize.sync();
+        console.log('Database connected and synced');
+        app.listen(PORT, () => console.log(`✅ Server running at http://localhost:${PORT}`));
+    } catch (err) {
+        console.error('Failed to start server:', err);
     }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-        return res.status(400).json({ message: "Invalid credentials" });
-    }
-
-    const token = jwt.sign({ email: user.email }, SECRET, { expiresIn: '1h' });
-    res.json({ message: "Login successful", token });
-});
-
-app.get('/', (req, res) => {
-    res.send('API is working! Use /signup or /login endpoints.');
-});
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+})();

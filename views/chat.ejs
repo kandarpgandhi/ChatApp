@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Chat Window</title>
+    <%- include('partials/head') %>
+        <style>
+            body {
+                background: #f4f5f7;
+                font-family: 'Segoe UI', sans-serif;
+            }
+
+            .chat-container {
+                max-width: 600px;
+                margin: 40px auto;
+                background: #fff;
+                border-radius: 12px;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+                display: flex;
+                flex-direction: column;
+                height: 80vh;
+                overflow: hidden;
+            }
+
+            .chat-header {
+                padding: 16px;
+                background: #007bff;
+                color: white;
+                font-weight: bold;
+                text-align: center;
+            }
+
+            .chat-body {
+                flex: 1;
+                padding: 16px;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                scroll-behavior: smooth;
+            }
+
+            .message {
+                max-width: 75%;
+                padding: 10px 14px;
+                border-radius: 16px;
+                word-wrap: break-word;
+            }
+
+            .sent {
+                background: #007bff;
+                color: white;
+                align-self: flex-end;
+                border-bottom-right-radius: 4px;
+            }
+
+            .received {
+                background: #e9ecef;
+                align-self: flex-start;
+                border-bottom-left-radius: 4px;
+            }
+
+            .timestamp {
+                font-size: 11px;
+                color: gray;
+                margin-top: 4px;
+                text-align: right;
+            }
+
+            .chat-footer {
+                display: flex;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+                background: #f9f9f9;
+            }
+
+            #messageInput {
+                flex: 1;
+                padding: 10px;
+                border-radius: 20px;
+                border: 1px solid #ccc;
+                outline: none;
+            }
+
+            #sendBtn {
+                background: #007bff;
+                color: white;
+                border: none;
+                padding: 10px 16px;
+                border-radius: 50%;
+                margin-left: 8px;
+                cursor: pointer;
+            }
+
+            #sendBtn:hover {
+                background: #0056b3;
+            }
+        </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-header">Chat Room</div>
+        <div class="chat-body" id="chatBody">
+            <div class="message received">
+                Hey there! 👋
+                <div class="timestamp">10:00 AM</div>
+            </div>
+            <div class="message sent">
+                Hello! How are you?
+                <div class="timestamp">10:02 AM</div>
+            </div>
+        </div>
+        <div class="chat-footer">
+            <input id="messageInput" type="text" placeholder="Type your message..." />
+            <button id="sendBtn">➤</button>
+        </div>
+    </div>
+
+    <script src="/js/chat.js"></script>
+</body>
+
+</html>
