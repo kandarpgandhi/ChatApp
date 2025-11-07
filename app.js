@@ -5,6 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const { sequelize } = require('./models');
 const authRoutes = require('./routes/auth');
+const chatRoutes = require('./routes/chatRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,7 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/api/auth', authRoutes);
-
+app.use('/api/chat', chatRoutes);
 // 🟩 View Routes
 app.get('/', (req, res) => res.redirect('/signup'));
 app.get('/login', (req, res) => res.render('login'));

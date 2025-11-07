@@ -15,5 +15,9 @@ const sequelize = new Sequelize(
 const db = { Sequelize, sequelize };
 
 db.User = require('./user')(sequelize, Sequelize);
+db.ChatMessage = require('./chatMessage')(sequelize, Sequelize);
+
+db.User.hasMany(db.ChatMessage, { foreignKey: 'userId' });
+db.ChatMessage.belongsTo(db.User, { foreignKey: 'userId' });
 
 module.exports = db;
